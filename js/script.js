@@ -259,7 +259,7 @@ function applyPreset(preset) {
     localStorage.setItem('lastPresetId', preset.id);
 }
 
-function changeAesthetic() {
+function changeAesthetic(triggerMethod = 'button') {
     elements.refreshBtn.classList.add('refreshing');
     
     // Fade out
@@ -268,6 +268,11 @@ function changeAesthetic() {
     setTimeout(() => {
         const newPreset = selectRandomPreset();
         applyPreset(newPreset);
+        
+        // Track aesthetic change
+        if (typeof trackAestheticChange === 'function') {
+            trackAestheticChange(newPreset.id, newPreset.name, triggerMethod);
+        }
         
         // Fade back in
         elements.quoteWrapper.style.opacity = '1';
@@ -289,12 +294,22 @@ async function toggleWebcam() {
         }
         elements.webcamToggle.classList.remove('active');
         isWebcamActive = false;
+        
+        // Track hand tracking toggle
+        if (typeof trackHandTracking === 'function') {
+            trackHandTracking(false);
+        }
     } else {
         // Start webcam
         try {
             await startHandTracking();
             elements.webcamToggle.classList.add('active');
             isWebcamActive = true;
+            
+            // Track hand tracking toggle
+            if (typeof trackHandTracking === 'function') {
+                trackHandTracking(true);
+            }
         } catch (err) {
             console.error('Failed to start webcam:', err);
             alert('Could not access webcam. Please allow camera permissions.');
@@ -357,16 +372,23 @@ function onHandResults(results) {
                 const maxDist = 0.25;
                 const normalizedDist = Math.max(0, Math.min(1, (pinchDistance - minDist) / (maxDist - minDist)));
                 
-                // Map normalized distance to zoom:
-                // Fingers CLOSE (normalizedDist = 0) → zoom OUT (0.7x)
-                // Fingers APART (normalizedDist = 1) → zoom IN (2.0x)
-                const minZoom = 0.7;  // Reduced range for less sensitivity
-                const maxZoom = 2.0;   // Reduced from 3.0
-                const zoomValue = minZoom + (normalizedDist * (maxZoom - minZoom));
-                
-                if (particleSystem) {
-                    particleSystem.setZoom(zoomValue);
-                }
+        // Map normalized distance to zoom:
+        // Fingers CLOSE (normalizedDist = 0) → zoom OUT (0.7x)
+        // Fingers APART (normalizedDist = 1) → zoom IN (2.0x)
+        const minZoom = 0.7;  // Reduced range for less sensitivity
+        const maxZoom = 2.0;   // Reduced from 3.0
+        const zoomValue = minZoom + (normalizedDist * (maxZoom - minZoom));
+        
+        if (particleSystem) {
+            particleSystem.setZoom(zoomValue);
+            // Track pinch zoom (debounced)
+            if (typeof trackZoom === 'function') {
+                clearTimeout(window.pinchZoomTrackTimeout);
+                window.pinchZoomTrackTimeout = setTimeout(() => {
+                    trackZoom(zoomValue, 'pinch');
+                }, 500);
+            }
+        }
             }
             lastPinchDistance = pinchDistance;
         } else {
@@ -395,10 +417,15 @@ function onHandResults(results) {
             // Detect snap when fingers come together
             if (snapDistance < 0.05 && (currentTime - lastSnapTime) > snapCooldown) {
                 // SNAP! Trigger change
-                changeAesthetic();
+                changeAesthetic('snap');
                 lastSnapTime = currentTime;
                 snapState = 'triggered';
                 console.log('👆 Snap detected!');
+                
+                // Track snap gesture
+                if (typeof trackSnapGesture === 'function') {
+                    trackSnapGesture();
+                }
             }
         } else if (snapState === 'triggered') {
             // Wait for fingers to separate before allowing next snap
@@ -432,12 +459,22 @@ function toggleMusic() {
         }
         elements.musicToggle.classList.remove('playing');
         isMusicPlaying = false;
+        
+        // Track music toggle
+        if (typeof trackMusicToggle === 'function') {
+            trackMusicToggle(false);
+        }
     } else {
         // Play music
         if (youtubePlayer && isYouTubeReady) {
             youtubePlayer.playVideo();
             elements.musicToggle.classList.add('playing');
             isMusicPlaying = true;
+            
+            // Track music toggle
+            if (typeof trackMusicToggle === 'function') {
+                trackMusicToggle(true);
+            }
         } else {
             console.log('YouTube player not ready yet. Still loading...');
             alert('Music player is still loading. Please wait a moment and try again.');
@@ -450,6 +487,11 @@ function loadInitialPreset() {
     let preset = lastPresetId ? aestheticPresets.find(p => p.id === parseInt(lastPresetId)) : null;
     if (!preset) preset = selectRandomPreset();
     applyPreset(preset);
+    
+    // Track initial preset selection
+    if (typeof trackPresetSelected === 'function') {
+        trackPresetSelected(preset.id, preset.name);
+    }
 }
 
 function hideLoadingScreen() {
@@ -485,7 +527,7 @@ elements.canvas.addEventListener('mousemove', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && e.target === document.body) {
         e.preventDefault();
-        changeAesthetic();
+        changeAesthetic('keyboard');
     }
     if (e.code === 'KeyM') {
         e.preventDefault();
@@ -498,15 +540,30 @@ document.addEventListener('keydown', (e) => {
     // Zoom controls
     if (e.code === 'Equal' || e.code === 'NumpadAdd') {
         e.preventDefault();
-        if (particleSystem) particleSystem.adjustZoom(0.2);
+        if (particleSystem) {
+            particleSystem.adjustZoom(0.2);
+            if (typeof trackZoom === 'function') {
+                trackZoom(particleSystem.targetZoom, 'keyboard');
+            }
+        }
     }
     if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
         e.preventDefault();
-        if (particleSystem) particleSystem.adjustZoom(-0.2);
+        if (particleSystem) {
+            particleSystem.adjustZoom(-0.2);
+            if (typeof trackZoom === 'function') {
+                trackZoom(particleSystem.targetZoom, 'keyboard');
+            }
+        }
     }
     if (e.code === 'Digit0' || e.code === 'Numpad0') {
         e.preventDefault();
-        if (particleSystem) particleSystem.setZoom(1.0);
+        if (particleSystem) {
+            particleSystem.setZoom(1.0);
+            if (typeof trackZoom === 'function') {
+                trackZoom(1.0, 'keyboard');
+            }
+        }
     }
 });
 
@@ -523,6 +580,13 @@ elements.canvas.addEventListener('wheel', (e) => {
     if (particleSystem) {
         const delta = e.deltaY > 0 ? -0.1 : 0.1;
         particleSystem.adjustZoom(delta);
+        // Track zoom (debounced to avoid too many events)
+        if (typeof trackZoom === 'function') {
+            clearTimeout(window.zoomTrackTimeout);
+            window.zoomTrackTimeout = setTimeout(() => {
+                trackZoom(particleSystem.targetZoom, 'mouse_wheel');
+            }, 500);
+        }
     }
 }, { passive: false });
 
@@ -553,7 +617,7 @@ elements.canvas.addEventListener('touchstart', (e) => {
         if (currentTime - lastTouchTime < 300) {
             // Double tap detected!
             e.preventDefault();
-            changeAesthetic();
+            changeAesthetic('touch');
             touchCount = 0;
         } else {
             touchCount++;
@@ -577,7 +641,15 @@ elements.canvas.addEventListener('touchmove', (e) => {
         const newZoom = touchStartZoom * scale;
         
         if (particleSystem) {
-            particleSystem.setZoom(Math.max(0.5, Math.min(3.0, newZoom)));
+            const clampedZoom = Math.max(0.5, Math.min(3.0, newZoom));
+            particleSystem.setZoom(clampedZoom);
+            // Track touch zoom (debounced)
+            if (typeof trackZoom === 'function') {
+                clearTimeout(window.touchZoomTrackTimeout);
+                window.touchZoomTrackTimeout = setTimeout(() => {
+                    trackZoom(clampedZoom, 'touch');
+                }, 500);
+            }
         }
     }
 }, { passive: false });

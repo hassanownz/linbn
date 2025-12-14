@@ -44,6 +44,12 @@
 - Touch-optimized controls
 - Works beautifully on desktop, tablet, and phone
 
+📊 **Analytics Ready**
+- Google Analytics 4 integration
+- Tracks user interactions (hand tracking, music, aesthetic changes)
+- Privacy-friendly configuration
+- Easy to enable/disable
+
 ♿ **Accessible**
 - Respects `prefers-reduced-motion` settings
 - Keyboard navigation
@@ -71,7 +77,33 @@ Add 3 ambient sound files to `assets/sounds/`:
 
 See `assets/sounds/SOUNDS_GUIDE.md` for detailed specifications and recommendations.
 
-### 3. Serve the Website
+### 3. Configure Analytics (Optional)
+
+To enable Google Analytics:
+
+1. Create a Google Analytics 4 property at [analytics.google.com](https://analytics.google.com)
+2. Get your Measurement ID (format: `G-XXXXXXXXXX`)
+3. Open `js/analytics.js` and replace `'G-XXXXXXXXXX'` with your Measurement ID:
+   ```javascript
+   const ANALYTICS_CONFIG = {
+       measurementId: 'G-XXXXXXXXXX', // Your GA4 Measurement ID
+       enabled: true,
+       debug: false
+   };
+   ```
+
+The analytics will track:
+- Page views
+- Hand tracking toggles
+- Music toggles
+- Aesthetic changes (which presets are selected)
+- User engagement (time on page)
+- Zoom interactions
+- Snap gestures
+
+To disable analytics, set `enabled: false` in the config.
+
+### 4. Serve the Website
 
 You can use any static file server. Here are a few options:
 
@@ -125,7 +157,9 @@ linbn/
 ├── css/
 │   └── styles.css         # All styles and animations
 ├── js/
-│   └── script.js          # Aesthetic rotation and interactions
+│   ├── script.js          # Aesthetic rotation and interactions
+│   ├── particles.js       # Particle system implementation
+│   └── analytics.js       # Analytics tracking (Google Analytics 4)
 ├── assets/
 │   ├── images/            # Background images (add your own)
 │   │   ├── IMAGES_GUIDE.md
