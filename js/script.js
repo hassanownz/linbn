@@ -531,6 +531,7 @@ elements.canvas.addEventListener('wheel', (e) => {
 
 // This function is called by YouTube IFrame API when ready
 window.onYouTubeIframeAPIReady = function() {
+    console.log('YouTube IFrame API loaded');
     youtubePlayer = new YT.Player('youtubePlayer', {
         height: '0',
         width: '0',
@@ -557,6 +558,11 @@ window.onYouTubeIframeAPIReady = function() {
                 if (event.data === YT.PlayerState.ENDED) {
                     youtubePlayer.playVideo();
                 }
+            },
+            onError: function(event) {
+                console.error('YouTube player error:', event.data);
+                console.log('Error codes: 2=Invalid ID, 5=HTML5 error, 100=Video not found, 101/150=Embedding disabled');
+                alert('YouTube video cannot be played. The video may have embedding disabled or be unavailable.');
             }
         }
     });
