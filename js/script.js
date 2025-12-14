@@ -436,11 +436,12 @@ function toggleMusic() {
         // Play music
         if (youtubePlayer && isYouTubeReady) {
             youtubePlayer.playVideo();
+            elements.musicToggle.classList.add('playing');
+            isMusicPlaying = true;
         } else {
-            console.log('YouTube player not ready yet');
+            console.log('YouTube player not ready yet. Still loading...');
+            alert('Music player is still loading. Please wait a moment and try again.');
         }
-        elements.musicToggle.classList.add('playing');
-        isMusicPlaying = true;
     }
 }
 
@@ -529,10 +530,34 @@ elements.canvas.addEventListener('wheel', (e) => {
 // YouTube Player Setup
 // ============================================
 
+// Load YouTube IFrame API dynamically
+function loadYouTubeAPI() {
+    // Check if already loaded
+    if (window.YT && window.YT.Player) {
+        initYouTubePlayer();
+        return;
+    }
+    
+    // Load the API
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    tag.onerror = function() {
+        console.error('Failed to load YouTube IFrame API');
+        alert('YouTube music unavailable. Check your internet connection.');
+    };
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
+
 // This function is called by YouTube IFrame API when ready
 window.onYouTubeIframeAPIReady = function() {
-    console.log('YouTube IFrame API loaded');
-    youtubePlayer = new YT.Player('youtubePlayer', {
+    console.log('YouTube IFrame API loaded successfully');
+    initYouTubePlayer();
+};
+
+function initYouTubePlayer() {
+    try {
+        youtubePlayer = new YT.Player('youtubePlayer', {
         height: '0',
         width: '0',
         videoId: 'u7K72X4eo_s', // The video ID from the URL
@@ -566,7 +591,11 @@ window.onYouTubeIframeAPIReady = function() {
             }
         }
     });
-};
+    } catch (error) {
+        console.error('Error initializing YouTube player:', error);
+        alert('Failed to initialize YouTube player. Music unavailable.');
+    }
+}
 
 // ============================================
 // Initialization
@@ -587,6 +616,9 @@ function init() {
     
     // Auto-hide hint
     autoHideHint();
+    
+    // Load YouTube API
+    loadYouTubeAPI();
     
     console.log('🌟 Life is nothing but now - Interactive Mode Ready!');
     console.log('💡 Press W to enable hand tracking, M for music');
