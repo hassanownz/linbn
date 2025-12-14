@@ -1,0 +1,28 @@
+{
+  "name": "life-is-nothing-but-now",
+  "version": "1.0.0",
+  "description": "A minimalist, aesthetic website that reminds you to stay present and live in the moment",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "serve": "npx http-server -p 8000 -o",
+    "dev": "npx live-server --port=8000"
+  },
+  "keywords": [
+    "mindfulness",
+    "meditation",
+    "present-moment",
+    "aesthetic",
+    "minimalist",
+    "zen"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/linbn.git"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
+

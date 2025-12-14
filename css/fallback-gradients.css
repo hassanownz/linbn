@@ -1,0 +1,104 @@
+/* ============================================
+   Fallback Gradients (No Images Needed)
+   ============================================
+   
+   If you don't have images yet, you can use these
+   beautiful gradient backgrounds as a temporary solution.
+   
+   To use: Import this file in index.html or copy
+   the gradients to your aesthetic presets in script.js
+*/
+
+/* Gradient Presets */
+
+.gradient-1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.gradient-3 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.gradient-4 {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.gradient-5 {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.gradient-6 {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.gradient-7 {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.gradient-8 {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+}
+
+.gradient-9 {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.gradient-10 {
+    background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%);
+}
+
+.gradient-11 {
+    background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+}
+
+.gradient-12 {
+    background: linear-gradient(135deg, #f8b500 0%, #fceabb 100%);
+}
+
+/* Animated Gradients */
+
+.gradient-animated-1 {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+.gradient-animated-2 {
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* How to use in script.js:
+   
+   Instead of:
+   background: 'assets/images/mountain.jpg',
+   
+   Use:
+   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+   
+   And in applyPreset function, check if it's a gradient:
+   if (preset.background.startsWith('linear-gradient') || preset.background.startsWith('radial-gradient')) {
+       elements.backgroundContainer.style.background = preset.background;
+       elements.backgroundContainer.style.backgroundImage = 'none';
+   } else {
+       elements.backgroundContainer.style.backgroundImage = `url('${preset.background}')`;
+   }
+*/
+
