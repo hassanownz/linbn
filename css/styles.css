@@ -273,16 +273,16 @@ body {
 
 .attribution {
     position: fixed;
-    bottom: 0.75rem;
+    bottom: 2rem;
     left: 2rem;
     z-index: 100;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
     font-weight: 300;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
     opacity: 0;
     animation: fadeIn 800ms var(--transition-ease) forwards;
-    animation-delay: 2500ms;
+    animation-delay: 2000ms;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
 }
 
