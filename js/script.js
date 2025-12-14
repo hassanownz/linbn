@@ -527,6 +527,69 @@ elements.canvas.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 // ============================================
+// Mobile Touch Gestures
+// ============================================
+
+let touchStartDistance = null;
+let touchStartZoom = 1.0;
+let lastTouchTime = 0;
+let touchCount = 0;
+
+// Touch start - detect pinch and double tap
+elements.canvas.addEventListener('touchstart', (e) => {
+    const currentTime = Date.now();
+    
+    if (e.touches.length === 2) {
+        // Two fingers - pinch to zoom
+        e.preventDefault();
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        touchStartDistance = Math.sqrt(dx * dx + dy * dy);
+        touchStartZoom = particleSystem ? particleSystem.zoom : 1.0;
+    } else if (e.touches.length === 1) {
+        // Single touch - detect double tap for changing aesthetic
+        if (currentTime - lastTouchTime < 300) {
+            // Double tap detected!
+            e.preventDefault();
+            changeAesthetic();
+            touchCount = 0;
+        } else {
+            touchCount++;
+            lastTouchTime = currentTime;
+        }
+    }
+}, { passive: false });
+
+// Touch move - handle pinch zoom
+elements.canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && touchStartDistance !== null) {
+        e.preventDefault();
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        const currentDistance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Calculate zoom based on pinch
+        const scale = currentDistance / touchStartDistance;
+        const newZoom = touchStartZoom * scale;
+        
+        if (particleSystem) {
+            particleSystem.setZoom(Math.max(0.5, Math.min(3.0, newZoom)));
+        }
+    }
+}, { passive: false });
+
+// Touch end - reset
+elements.canvas.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) {
+        touchStartDistance = null;
+    }
+}, { passive: false });
+
+// ============================================
 // YouTube Player Setup
 // ============================================
 

@@ -424,13 +424,7 @@ body {
     }
     
     .hint {
-        font-size: 0.75rem;
-        bottom: 1.5rem;
-    }
-    
-    .hint kbd {
-        padding: 0.15em 0.4em;
-        font-size: 0.85em;
+        display: none; /* Hide keyboard hints on mobile */
     }
     
     .attribution {
